@@ -3102,11 +3102,20 @@ class MainWindow(TkinterDnD.Tk if is_windows else tk.Tk):
         """Ask user is they want to update"""
         
         is_new_update = self.online_data_refresh(confirmation_box=True)
+        is_download_in_app_var = tk.BooleanVar(value=False)
         
+        def update_type():
+            if is_download_in_app_var.get():
+                self.download_item(is_update_app=True)
+            else:
+                webbrowser.open_new_tab(self.download_update_link_var.get())
+
+            update_confirmation_win.destroy()
+            
         if is_new_update:
             
             update_confirmation_win = Toplevel()
-            
+
             update_confirmation_Frame = self.menu_FRAME_SET(update_confirmation_win)
             update_confirmation_Frame.grid(row=0,column=0,padx=0,pady=0)  
             
@@ -3116,11 +3125,14 @@ class MainWindow(TkinterDnD.Tk if is_windows else tk.Tk):
             confirm_update_label = self.menu_sub_LABEL_SET(update_confirmation_Frame, 'Are you sure you want to continue?\n\nThe application will need to be restarted.\n', font_size=FONT_SIZE_3)
             confirm_update_label.grid(row=1,column=0,padx=0,pady=5)
                     
-            yes_button = ttk.Button(update_confirmation_Frame, text='Yes', command=lambda:(self.download_item(is_update_app=True), update_confirmation_win.destroy()))
+            yes_button = ttk.Button(update_confirmation_Frame, text='Yes', command=update_type)
             yes_button.grid(row=2,column=0,padx=0,pady=5)
             
             no_button = ttk.Button(update_confirmation_Frame, text='No', command=lambda:(update_confirmation_win.destroy()))
             no_button.grid(row=3,column=0,padx=0,pady=5)
+            
+            download_outside_application_button = ttk.Checkbutton(update_confirmation_Frame, variable=is_download_in_app_var, text='Download Update in Application')
+            download_outside_application_button.grid(row=4,column=0,padx=0,pady=5)
             
             self.menu_placement(update_confirmation_win, "Confirm Update", pop_up=True)
 
